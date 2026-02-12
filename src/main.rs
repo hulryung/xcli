@@ -4,7 +4,8 @@ mod config;
 mod oauth;
 
 use clap::{Parser, Subcommand};
-use config::{Config, Credentials};
+use config::{ApiKeys, Config, Credentials};
+use std::io::{self, Write};
 
 #[derive(Parser)]
 #[command(name = "xcli", about = "X (Twitter) API CLI")]
@@ -40,6 +41,21 @@ enum AuthAction {
     Logout,
     /// Show current auth status
     Status,
+    /// Set up API keys
+    Setup {
+        /// API Key (Consumer Key)
+        #[arg(long)]
+        api_key: Option<String>,
+        /// API Secret (Consumer Secret)
+        #[arg(long)]
+        api_secret: Option<String>,
+        /// Access Token (optional)
+        #[arg(long)]
+        access_token: Option<String>,
+        /// Access Token Secret (optional)
+        #[arg(long)]
+        access_token_secret: Option<String>,
+    },
 }
 
 #[tokio::main]
@@ -92,7 +108,7 @@ async fn handle_auth(action: AuthAction) {
                 Ok(keys) => keys,
                 Err(e) => {
                     eprintln!("Error: {e}");
-                    eprintln!("Set X_API_KEY and X_API_SECRET in your .env file.");
+                    eprintln!("Run `xcli auth setup` or set X_API_KEY and X_API_SECRET in .env.");
                     std::process::exit(1);
                 }
             };
@@ -136,5 +152,53 @@ async fn handle_auth(action: AuthAction) {
                 println!("Run `xcli auth login` to authenticate.");
             }
         },
+        AuthAction::Setup {
+            api_key,
+            api_secret,
+            access_token,
+            access_token_secret,
+        } => {
+            let api_key = api_key.unwrap_or_else(|| prompt("API Key"));
+            let api_secret = api_secret.unwrap_or_else(|| prompt("API Secret"));
+            let access_token = access_token.or_else(|| prompt_optional("Access Token"));
+            let access_token_secret =
+                access_token_secret.or_else(|| prompt_optional("Access Token Secret"));
+
+            let keys = ApiKeys {
+                api_key,
+                api_secret,
+                access_token,
+                access_token_secret,
+            };
+
+            if let Err(e) = keys.save() {
+                eprintln!("Error: {e}");
+                std::process::exit(1);
+            }
+            println!("Keys saved to {}", config::keys_path().display());
+        }
     }
+}
+
+fn prompt(label: &str) -> String {
+    loop {
+        print!("{label}: ");
+        io::stdout().flush().unwrap();
+        let mut buf = String::new();
+        io::stdin().read_line(&mut buf).unwrap();
+        let val = buf.trim().to_string();
+        if !val.is_empty() {
+            return val;
+        }
+        eprintln!("{label} is required.");
+    }
+}
+
+fn prompt_optional(label: &str) -> Option<String> {
+    print!("{label} (optional, press Enter to skip): ");
+    io::stdout().flush().unwrap();
+    let mut buf = String::new();
+    io::stdin().read_line(&mut buf).unwrap();
+    let val = buf.trim().to_string();
+    if val.is_empty() { None } else { Some(val) }
 }
