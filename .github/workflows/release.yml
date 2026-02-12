@@ -128,12 +128,12 @@ jobs:
         run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
 
       - name: Download checksums
+        env:
+          GH_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
         run: |
-          VERSION=${{ steps.version.outputs.version }}
           TAG=${GITHUB_REF_NAME}
-          BASE_URL="https://github.com/hulryung/xcli/releases/download/${TAG}"
           for target in x86_64-apple-darwin aarch64-apple-darwin x86_64-unknown-linux-musl aarch64-unknown-linux-musl; do
-            curl -sL "${BASE_URL}/xcli-${target}.tar.gz.sha256" -o "xcli-${target}.tar.gz.sha256"
+            gh release download "${TAG}" --repo hulryung/xcli --pattern "xcli-${target}.tar.gz.sha256"
           done
 
       - name: Extract checksums
@@ -155,30 +155,30 @@ jobs:
         run: |
           VERSION=${{ steps.version.outputs.version }}
           TAG=${GITHUB_REF_NAME}
-          cat > homebrew-xcli/Formula/xcli.rb << 'FORMULA'
+          cat > homebrew-xcli/Formula/xcli.rb <<FORMULA
           class Xcli < Formula
             desc "X (Twitter) API CLI tool"
             homepage "https://github.com/hulryung/xcli"
-            version "VERSION_PLACEHOLDER"
+            version "${VERSION}"
             license "MIT"
 
             on_macos do
               if Hardware::CPU.intel?
-                url "https://github.com/hulryung/xcli/releases/download/TAG_PLACEHOLDER/xcli-x86_64-apple-darwin.tar.gz"
-                sha256 "SHA_X86_64_APPLE"
+                url "https://github.com/hulryung/xcli/releases/download/${TAG}/xcli-x86_64-apple-darwin.tar.gz"
+                sha256 "${{ steps.sha.outputs.x86_64_apple }}"
               else
-                url "https://github.com/hulryung/xcli/releases/download/TAG_PLACEHOLDER/xcli-aarch64-apple-darwin.tar.gz"
-                sha256 "SHA_AARCH64_APPLE"
+                url "https://github.com/hulryung/xcli/releases/download/${TAG}/xcli-aarch64-apple-darwin.tar.gz"
+                sha256 "${{ steps.sha.outputs.aarch64_apple }}"
               end
             end
 
             on_linux do
               if Hardware::CPU.intel?
-                url "https://github.com/hulryung/xcli/releases/download/TAG_PLACEHOLDER/xcli-x86_64-unknown-linux-musl.tar.gz"
-                sha256 "SHA_X86_64_LINUX"
+                url "https://github.com/hulryung/xcli/releases/download/${TAG}/xcli-x86_64-unknown-linux-musl.tar.gz"
+                sha256 "${{ steps.sha.outputs.x86_64_linux }}"
               else
-                url "https://github.com/hulryung/xcli/releases/download/TAG_PLACEHOLDER/xcli-aarch64-unknown-linux-musl.tar.gz"
-                sha256 "SHA_AARCH64_LINUX"
+                url "https://github.com/hulryung/xcli/releases/download/${TAG}/xcli-aarch64-unknown-linux-musl.tar.gz"
+                sha256 "${{ steps.sha.outputs.aarch64_linux }}"
               end
             end
 
@@ -191,13 +191,6 @@ jobs:
             end
           end
           FORMULA
-
-          sed -i "s/VERSION_PLACEHOLDER/${VERSION}/g" homebrew-xcli/Formula/xcli.rb
-          sed -i "s/TAG_PLACEHOLDER/${TAG}/g" homebrew-xcli/Formula/xcli.rb
-          sed -i "s/SHA_X86_64_APPLE/${{ steps.sha.outputs.x86_64_apple }}/g" homebrew-xcli/Formula/xcli.rb
-          sed -i "s/SHA_AARCH64_APPLE/${{ steps.sha.outputs.aarch64_apple }}/g" homebrew-xcli/Formula/xcli.rb
-          sed -i "s/SHA_X86_64_LINUX/${{ steps.sha.outputs.x86_64_linux }}/g" homebrew-xcli/Formula/xcli.rb
-          sed -i "s/SHA_AARCH64_LINUX/${{ steps.sha.outputs.aarch64_linux }}/g" homebrew-xcli/Formula/xcli.rb
 
       - name: Commit and push formula
         run: |
