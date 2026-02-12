@@ -5,11 +5,11 @@
 [![GitHub Release](https://img.shields.io/github/v/release/hulryung/xcli)](https://github.com/hulryung/xcli/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-X (Twitter) API CLI tool.
+X (Twitter) API CLI 도구.
 
-[한국어](README.ko.md)
+[English](README.md)
 
-## Installation
+## 설치
 
 ### Homebrew (macOS / Linux)
 
@@ -24,11 +24,11 @@ brew install xcli
 winget install hulryung.xcli
 ```
 
-### Binary Download
+### 바이너리 다운로드
 
-Download pre-built binaries from [GitHub Releases](https://github.com/hulryung/xcli/releases/latest).
+[GitHub Releases](https://github.com/hulryung/xcli/releases/latest)에서 플랫폼별 바이너리를 다운로드할 수 있습니다.
 
-| Platform | File |
+| 플랫폼 | 파일 |
 |---|---|
 | macOS (Intel) | `xcli-x86_64-apple-darwin.tar.gz` |
 | macOS (Apple Silicon) | `xcli-aarch64-apple-darwin.tar.gz` |
@@ -43,7 +43,7 @@ Download pre-built binaries from [GitHub Releases](https://github.com/hulryung/x
 cargo install xcli
 ```
 
-### Build from Source
+### 소스에서 빌드
 
 ```bash
 git clone https://github.com/hulryung/xcli.git
@@ -51,34 +51,34 @@ cd xcli
 cargo build --release
 ```
 
-## Authentication
+## 인증
 
-Two authentication methods are supported.
+두 가지 인증 방식을 지원합니다.
 
-### A. OAuth Login (Team Use)
+### A. OAuth Login (사내 배포용)
 
-An admin provides the X Developer App's API Key/Secret, and each user authenticates with their own account.
+관리자가 X Developer App의 API Key/Secret을 제공하면, 각 사용자가 본인 계정으로 인증합니다.
 
-1. Set the admin-provided keys in a `.env` file:
+1. `.env` 파일에 관리자가 제공한 키 설정:
    ```
    X_API_KEY=your_api_key
    X_API_SECRET=your_api_secret
    ```
 
-2. Login:
+2. 로그인:
    ```bash
    xcli auth login
    ```
-   A browser will open for you to authorize the app with your X account. Tokens are saved to `~/.config/xcli/credentials.json`.
+   브라우저가 열리면 X 계정으로 앱을 승인합니다. 토큰이 `~/.config/xcli/credentials.json`에 저장됩니다.
 
-> **App Setup (Admin)**: Register `http://127.0.0.1:18923/callback` as a Callback URL in the X Developer Portal.
+> **App 설정 (관리자)**: X Developer Portal에서 Callback URL에 `http://127.0.0.1:18923/callback`을 등록해야 합니다.
 
-### B. Direct Token (Personal Use)
+### B. Direct Token (개인 사용)
 
-Create your own X Developer App and use it directly.
+본인이 X Developer App을 직접 만들어 사용합니다.
 
-1. Create an app at the [X Developer Portal](https://developer.x.com)
-2. Set all 4 tokens in a `.env` file:
+1. [X Developer Portal](https://developer.x.com)에서 앱 생성
+2. `.env` 파일에 4개 토큰 설정:
    ```
    X_API_KEY=your_api_key
    X_API_SECRET=your_api_secret
@@ -86,46 +86,46 @@ Create your own X Developer App and use it directly.
    X_ACCESS_TOKEN_SECRET=your_access_token_secret
    ```
 
-No `auth login` required.
+`auth login` 없이 바로 사용 가능합니다.
 
-## Usage
+## 사용법
 
-### Post a Tweet
+### 트윗 작성
 
 ```bash
 xcli tweet "Hello from xcli!"
 # Tweet posted! ID: 1234567890
 ```
 
-### Delete a Tweet
+### 트윗 삭제
 
 ```bash
 xcli delete 1234567890
 # Tweet 1234567890 deleted.
 ```
 
-### Manage Authentication
+### 인증 관리
 
 ```bash
-# OAuth login (opens browser)
+# OAuth 로그인 (브라우저가 열림)
 xcli auth login
 # Logged in as @username
 
-# Check login status
+# 로그인 상태 확인
 xcli auth status
 # Logged in as @username
 # Credentials: /Users/you/.config/xcli/credentials.json
 
-# Logout (remove stored credentials)
+# 로그아웃 (저장된 토큰 삭제)
 xcli auth logout
 # Logged out. Credentials removed.
 ```
 
-## Auth Priority
+## 인증 우선순위
 
-1. `~/.config/xcli/credentials.json` (tokens saved via OAuth login)
-2. `X_ACCESS_TOKEN` / `X_ACCESS_TOKEN_SECRET` from `.env`
+1. `~/.config/xcli/credentials.json` (OAuth login으로 저장된 토큰)
+2. `.env`의 `X_ACCESS_TOKEN` / `X_ACCESS_TOKEN_SECRET`
 
-## License
+## 라이선스
 
 [MIT](LICENSE)
