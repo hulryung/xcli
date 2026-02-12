@@ -8,7 +8,7 @@ use config::{ApiKeys, Config, Credentials};
 use std::io::{self, Write};
 
 #[derive(Parser)]
-#[command(name = "xcli", about = "X (Twitter) API CLI")]
+#[command(name = "xcli", version, about = "X (Twitter) API CLI")]
 struct Cli {
     #[command(subcommand)]
     command: Commands,
@@ -27,6 +27,7 @@ enum Commands {
         id: String,
     },
     /// Manage authentication
+    #[command(long_about = "Manage authentication\n\nExamples:\n  xcli auth setup --api-key KEY --api-secret SECRET\n  xcli auth login\n  xcli auth status\n  xcli auth logout")]
     Auth {
         #[command(subcommand)]
         action: AuthAction,
@@ -36,12 +37,16 @@ enum Commands {
 #[derive(Subcommand)]
 enum AuthAction {
     /// Login via OAuth (opens browser)
+    #[command(long_about = "Login via OAuth (opens browser)\n\nStarts a 3-legged OAuth flow: opens the browser for authorization,\nthen saves the access token to ~/.config/xcli/credentials.json.\nRequires API keys (run `xcli auth setup` first or set .env).")]
     Login,
     /// Logout (delete stored credentials)
+    #[command(long_about = "Logout (delete stored credentials)\n\nRemoves ~/.config/xcli/credentials.json.\nAPI keys in keys.json are kept.")]
     Logout,
     /// Show current auth status
+    #[command(long_about = "Show current auth status\n\nDisplays the logged-in screen name and credentials path,\nor indicates that no user is logged in.")]
     Status,
     /// Set up API keys
+    #[command(long_about = "Set up API keys\n\nSaves API keys to ~/.config/xcli/keys.json.\nPass keys as arguments or omit them for interactive prompts.\n\nExamples:\n  xcli auth setup --api-key KEY --api-secret SECRET\n  xcli auth setup --api-key KEY --api-secret SECRET --access-token TOKEN --access-token-secret TOKEN_SECRET\n  xcli auth setup   (interactive)")]
     Setup {
         /// API Key (Consumer Key)
         #[arg(long)]
