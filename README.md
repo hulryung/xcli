@@ -88,18 +88,35 @@ cargo build --release
 
 ## Usage
 
+### 트윗 작성
+
 ```bash
-# Post a tweet
 xcli tweet "Hello from xcli!"
+# Tweet posted! ID: 1234567890
+```
 
-# Delete a tweet
-xcli delete <tweet_id>
+### 트윗 삭제
 
-# Check login status
+```bash
+xcli delete 1234567890
+# Tweet 1234567890 deleted.
+```
+
+### 인증 관리
+
+```bash
+# OAuth 로그인 (브라우저가 열림)
+xcli auth login
+# Logged in as @username
+
+# 로그인 상태 확인
 xcli auth status
+# Logged in as @username
+# Credentials: /Users/you/.config/xcli/credentials.json
 
-# Logout (remove stored credentials)
+# 로그아웃 (저장된 토큰 삭제)
 xcli auth logout
+# Logged out. Credentials removed.
 ```
 
 ## Auth Priority
