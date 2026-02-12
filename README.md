@@ -1,5 +1,10 @@
 # xcli
 
+[![CI](https://github.com/hulryung/xcli/actions/workflows/ci.yml/badge.svg)](https://github.com/hulryung/xcli/actions/workflows/ci.yml)
+[![Release](https://github.com/hulryung/xcli/actions/workflows/release.yml/badge.svg)](https://github.com/hulryung/xcli/actions/workflows/release.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/hulryung/xcli)](https://github.com/hulryung/xcli/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+
 X (Twitter) API CLI tool.
 
 ## Installation
