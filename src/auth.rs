@@ -1,9 +1,9 @@
-use hmac::{Hmac, Mac};
-use sha1::Sha1;
-use base64::Engine;
 use base64::engine::general_purpose::STANDARD;
-use percent_encoding::{AsciiSet, NON_ALPHANUMERIC, utf8_percent_encode};
+use base64::Engine;
+use hmac::{Hmac, Mac};
+use percent_encoding::{utf8_percent_encode, AsciiSet, NON_ALPHANUMERIC};
 use rand::Rng;
+use sha1::Sha1;
 use std::time::{SystemTime, UNIX_EPOCH};
 
 use crate::config::Config;
@@ -133,11 +133,7 @@ pub fn build_flexible_oauth_header(
 }
 
 /// Convenience wrapper for authenticated API calls (existing behavior).
-pub fn build_oauth_header(
-    config: &Config,
-    method: &str,
-    url: &str,
-) -> String {
+pub fn build_oauth_header(config: &Config, method: &str, url: &str) -> String {
     build_flexible_oauth_header(
         &config.api_key,
         &config.api_secret,

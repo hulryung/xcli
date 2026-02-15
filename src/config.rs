@@ -66,15 +66,13 @@ impl Credentials {
         }
         let json = serde_json::to_string_pretty(self)
             .map_err(|e| format!("Failed to serialize credentials: {e}"))?;
-        fs::write(path, json)
-            .map_err(|e| format!("Failed to write credentials: {e}"))?;
+        fs::write(path, json).map_err(|e| format!("Failed to write credentials: {e}"))?;
         Ok(())
     }
 
     pub fn delete_at(path: &PathBuf) -> Result<(), String> {
         if path.exists() {
-            fs::remove_file(path)
-                .map_err(|e| format!("Failed to delete credentials: {e}"))?;
+            fs::remove_file(path).map_err(|e| format!("Failed to delete credentials: {e}"))?;
         }
         Ok(())
     }
@@ -259,8 +257,9 @@ impl Config {
         // 3) .env access tokens
         let access_token = env::var("X_ACCESS_TOKEN")
             .map_err(|_| "Not logged in. Run `xcli auth login` or set X_ACCESS_TOKEN in .env")?;
-        let access_token_secret = env::var("X_ACCESS_TOKEN_SECRET")
-            .map_err(|_| "Not logged in. Run `xcli auth login` or set X_ACCESS_TOKEN_SECRET in .env")?;
+        let access_token_secret = env::var("X_ACCESS_TOKEN_SECRET").map_err(|_| {
+            "Not logged in. Run `xcli auth login` or set X_ACCESS_TOKEN_SECRET in .env"
+        })?;
 
         Ok(Config {
             api_key,

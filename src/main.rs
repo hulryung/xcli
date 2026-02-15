@@ -9,8 +9,18 @@ use config::{ApiKeys, Config, Credentials};
 use std::io::{self, Write};
 
 #[derive(Parser)]
-#[command(name = "xcli", version, about = "X (Twitter) API CLI")]
+#[command(
+    name = "xcli",
+    version,
+    about = "X (Twitter) API CLI",
+    disable_version_flag = true,
+    long_about = "X (Twitter) API CLI\n\nPost tweets, threads, and manage authentication from the command line.\nLong text is automatically split into threads. Supports OAuth and direct token auth."
+)]
 struct Cli {
+    /// Print version
+    #[arg(short = 'v', long = "version", action = clap::ArgAction::Version)]
+    version: (),
+
     #[command(subcommand)]
     command: Commands,
 }
@@ -18,20 +28,28 @@ struct Cli {
 #[derive(Subcommand)]
 enum Commands {
     /// Post a new tweet (long text is automatically threaded)
+    #[command(
+        long_about = "Post a new tweet (long text is automatically threaded)\n\nIf the text exceeds 280 weighted characters, it is automatically split into\na thread. You can also use '---' on its own line to manually control where\nthe split occurs.\n\nCJK characters (Korean, Chinese, Japanese) and emoji count as 2 characters.\n\nExamples:\n  xcli tweet \"Hello from xcli!\"\n  xcli tweet \"First tweet\\n---\\nSecond tweet\"\n  xcli tweet \"Long text...\" --dry-run"
+    )]
     Tweet {
         /// Text content of the tweet
         text: String,
-        /// Preview thread split without posting
+        /// Preview thread split without posting (shows character counts)
         #[arg(long)]
         dry_run: bool,
     },
     /// Delete a tweet by ID
+    #[command(
+        long_about = "Delete a tweet by ID\n\nPermanently deletes the specified tweet from your account.\n\nExamples:\n  xcli delete 1234567890"
+    )]
     Delete {
-        /// Tweet ID to delete
+        /// Tweet ID to delete (numeric ID from the tweet URL)
         id: String,
     },
     /// Manage authentication
-    #[command(long_about = "Manage authentication\n\nExamples:\n  xcli auth setup --api-key KEY --api-secret SECRET\n  xcli auth login\n  xcli auth status\n  xcli auth logout")]
+    #[command(
+        long_about = "Manage authentication\n\nSet up API keys, login via OAuth, check status, or logout.\nSupports both team (OAuth) and personal (direct token) workflows.\n\nExamples:\n  xcli auth setup --api-key KEY --api-secret SECRET\n  xcli auth login\n  xcli auth status\n  xcli auth logout"
+    )]
     Auth {
         #[command(subcommand)]
         action: AuthAction,
@@ -41,16 +59,24 @@ enum Commands {
 #[derive(Subcommand)]
 enum AuthAction {
     /// Login via OAuth (opens browser)
-    #[command(long_about = "Login via OAuth (opens browser)\n\nStarts a 3-legged OAuth flow: opens the browser for authorization,\nthen saves the access token to ~/.config/xcli/credentials.json.\nRequires API keys (run `xcli auth setup` first or set .env).")]
+    #[command(
+        long_about = "Login via OAuth (opens browser)\n\nStarts a 3-legged OAuth flow: opens the browser for authorization,\nthen saves the access token to ~/.config/xcli/credentials.json.\nRequires API keys (run `xcli auth setup` first or set .env)."
+    )]
     Login,
     /// Logout (delete stored credentials)
-    #[command(long_about = "Logout (delete stored credentials)\n\nRemoves ~/.config/xcli/credentials.json.\nAPI keys in keys.json are kept.")]
+    #[command(
+        long_about = "Logout (delete stored credentials)\n\nRemoves ~/.config/xcli/credentials.json.\nAPI keys in keys.json are kept."
+    )]
     Logout,
     /// Show current auth status
-    #[command(long_about = "Show current auth status\n\nDisplays the logged-in screen name and credentials path,\nor indicates that no user is logged in.")]
+    #[command(
+        long_about = "Show current auth status\n\nDisplays the logged-in screen name and credentials path,\nor indicates that no user is logged in."
+    )]
     Status,
     /// Set up API keys
-    #[command(long_about = "Set up API keys\n\nSaves API keys to ~/.config/xcli/keys.json.\nPass keys as arguments or omit them for interactive prompts.\n\nExamples:\n  xcli auth setup --api-key KEY --api-secret SECRET\n  xcli auth setup --api-key KEY --api-secret SECRET --access-token TOKEN --access-token-secret TOKEN_SECRET\n  xcli auth setup   (interactive)")]
+    #[command(
+        long_about = "Set up API keys\n\nSaves API keys to ~/.config/xcli/keys.json.\nPass keys as arguments or omit them for interactive prompts.\n\nExamples:\n  xcli auth setup --api-key KEY --api-secret SECRET\n  xcli auth setup --api-key KEY --api-secret SECRET --access-token TOKEN --access-token-secret TOKEN_SECRET\n  xcli auth setup   (interactive)"
+    )]
     Setup {
         /// API Key (Consumer Key)
         #[arg(long)]
@@ -212,10 +238,7 @@ async fn handle_auth(action: AuthAction) {
         AuthAction::Status => match Credentials::load() {
             Some(creds) => {
                 println!("Logged in as @{}", creds.screen_name);
-                println!(
-                    "Credentials: {}",
-                    config::credentials_path().display()
-                );
+                println!("Credentials: {}", config::credentials_path().display());
             }
             None => {
                 println!("Not logged in.");
@@ -270,5 +293,9 @@ fn prompt_optional(label: &str) -> Option<String> {
     let mut buf = String::new();
     io::stdin().read_line(&mut buf).unwrap();
     let val = buf.trim().to_string();
-    if val.is_empty() { None } else { Some(val) }
+    if val.is_empty() {
+        None
+    } else {
+        Some(val)
+    }
 }

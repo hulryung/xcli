@@ -97,6 +97,29 @@ xcli tweet "Hello from xcli!"
 # Tweet posted! ID: 1234567890
 ```
 
+### Post a Thread
+
+Long text is automatically split into a thread. You can also use `---` separators to control where splits occur.
+
+```bash
+# Auto-split long text into a thread
+xcli tweet "First tweet content...
+---
+Second tweet content...
+---
+Third tweet content..."
+# Thread posted! (3 tweets)
+#   [1/3] ID: 1111111111
+#   [2/3] ID: 2222222222
+#   [3/3] ID: 3333333333
+
+# Preview thread split without posting
+xcli tweet "long text here..." --dry-run
+# Thread preview (2 tweets):
+#   [1/2] (250/280) First chunk...
+#   [2/2] (180/280) Second chunk...
+```
+
 ### Delete a Tweet
 
 ```bash

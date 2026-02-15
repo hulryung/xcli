@@ -108,10 +108,7 @@ pub struct ThreadError {
     pub error: String,
 }
 
-pub async fn create_thread(
-    config: &Config,
-    chunks: &[String],
-) -> Result<Vec<String>, ThreadError> {
+pub async fn create_thread(config: &Config, chunks: &[String]) -> Result<Vec<String>, ThreadError> {
     let mut posted_ids: Vec<String> = Vec::new();
 
     for (i, chunk) in chunks.iter().enumerate() {

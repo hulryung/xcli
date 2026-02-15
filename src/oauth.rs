@@ -208,9 +208,7 @@ mod tests {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let port = listener.local_addr().unwrap().port();
 
-        let handle = std::thread::spawn(move || {
-            wait_for_callback(&listener)
-        });
+        let handle = std::thread::spawn(move || wait_for_callback(&listener));
 
         // Simulate browser callback
         let mut stream = TcpStream::connect(format!("127.0.0.1:{port}")).unwrap();
@@ -228,9 +226,7 @@ mod tests {
         let listener = TcpListener::bind("127.0.0.1:0").unwrap();
         let port = listener.local_addr().unwrap().port();
 
-        let handle = std::thread::spawn(move || {
-            wait_for_callback(&listener)
-        });
+        let handle = std::thread::spawn(move || wait_for_callback(&listener));
 
         let mut stream = TcpStream::connect(format!("127.0.0.1:{port}")).unwrap();
         stream
