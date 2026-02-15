@@ -8,6 +8,13 @@ const TWEETS_URL: &str = "https://api.x.com/2/tweets";
 #[derive(Serialize)]
 struct CreateTweetBody {
     text: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    reply: Option<ReplyTo>,
+}
+
+#[derive(Serialize)]
+struct ReplyTo {
+    in_reply_to_tweet_id: String,
 }
 
 #[derive(Deserialize)]
@@ -30,12 +37,19 @@ struct DeleteData {
     deleted: bool,
 }
 
-pub async fn create_tweet(config: &Config, text: &str) -> Result<String, String> {
+pub async fn create_tweet(
+    config: &Config,
+    text: &str,
+    reply_to: Option<&str>,
+) -> Result<String, String> {
     let auth_header = build_oauth_header(config, "POST", TWEETS_URL);
 
     let client = reqwest::Client::new();
     let body = CreateTweetBody {
         text: text.to_string(),
+        reply: reply_to.map(|id| ReplyTo {
+            in_reply_to_tweet_id: id.to_string(),
+        }),
     };
 
     let resp = client

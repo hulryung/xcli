@@ -72,7 +72,7 @@ async fn main() {
         Commands::Auth { action } => handle_auth(action).await,
         Commands::Tweet { text } => {
             let config = load_config_or_exit();
-            match api::create_tweet(&config, &text).await {
+            match api::create_tweet(&config, &text, None).await {
                 Ok(id) => println!("Tweet posted! ID: {id}"),
                 Err(e) => {
                     eprintln!("Failed to post tweet: {e}");
