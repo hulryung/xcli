@@ -2,6 +2,7 @@ mod api;
 mod auth;
 mod config;
 mod oauth;
+mod thread;
 
 use clap::{Parser, Subcommand};
 use config::{ApiKeys, Config, Credentials};
