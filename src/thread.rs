@@ -167,6 +167,18 @@ fn split_by_words(text: &str) -> Vec<String> {
     chunks
 }
 
+/// Validate that all chunks fit within the tweet limit.
+/// Returns Err with the index and length of the first oversized chunk.
+pub fn validate_chunks(chunks: &[String]) -> Result<(), (usize, usize)> {
+    for (i, chunk) in chunks.iter().enumerate() {
+        let len = weighted_len(chunk);
+        if len > MAX_WEIGHTED_LEN {
+            return Err((i, len));
+        }
+    }
+    Ok(())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -254,5 +266,18 @@ mod tests {
     fn separator_empty_parts_filtered() {
         let result = split_text("only part\n---\n\n---\n");
         assert_eq!(result, vec!["only part"]);
+    }
+
+    // validate_chunks tests
+    #[test]
+    fn validate_chunks_ok() {
+        let chunks = vec!["hello".to_string(), "world".to_string()];
+        assert!(validate_chunks(&chunks).is_ok());
+    }
+
+    #[test]
+    fn validate_chunks_oversized() {
+        let chunks = vec!["a".repeat(281)];
+        assert_eq!(validate_chunks(&chunks), Err((0, 281)));
     }
 }

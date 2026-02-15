@@ -98,6 +98,16 @@ async fn main() {
                 return;
             }
 
+            if let Err((idx, len)) = thread::validate_chunks(&chunks) {
+                eprintln!(
+                    "Error: chunk {} exceeds 280 characters ({}/280). Cannot post.",
+                    idx + 1,
+                    len
+                );
+                eprintln!("Use --dry-run to preview the split, or use --- separators to control splitting.");
+                std::process::exit(1);
+            }
+
             let config = load_config_or_exit();
 
             if chunks.len() == 1 {
