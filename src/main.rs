@@ -17,10 +17,13 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
-    /// Post a new tweet
+    /// Post a new tweet (long text is automatically threaded)
     Tweet {
         /// Text content of the tweet
         text: String,
+        /// Preview thread split without posting
+        #[arg(long)]
+        dry_run: bool,
     },
     /// Delete a tweet by ID
     Delete {
@@ -70,13 +73,64 @@ async fn main() {
 
     match cli.command {
         Commands::Auth { action } => handle_auth(action).await,
-        Commands::Tweet { text } => {
+        Commands::Tweet { text, dry_run } => {
+            let chunks = thread::split_text(&text);
+
+            if dry_run {
+                if chunks.len() == 1 {
+                    println!(
+                        "Tweet preview ({}/280):\n  {}",
+                        thread::weighted_len(&chunks[0]),
+                        chunks[0]
+                    );
+                } else {
+                    println!("Thread preview ({} tweets):", chunks.len());
+                    for (i, chunk) in chunks.iter().enumerate() {
+                        println!(
+                            "  [{}/{}] ({}/280) {}",
+                            i + 1,
+                            chunks.len(),
+                            thread::weighted_len(chunk),
+                            chunk
+                        );
+                    }
+                }
+                return;
+            }
+
             let config = load_config_or_exit();
-            match api::create_tweet(&config, &text, None).await {
-                Ok(id) => println!("Tweet posted! ID: {id}"),
-                Err(e) => {
-                    eprintln!("Failed to post tweet: {e}");
-                    std::process::exit(1);
+
+            if chunks.len() == 1 {
+                match api::create_tweet(&config, &chunks[0], None).await {
+                    Ok(id) => println!("Tweet posted! ID: {id}"),
+                    Err(e) => {
+                        eprintln!("Failed to post tweet: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                match api::create_thread(&config, &chunks).await {
+                    Ok(ids) => {
+                        println!("Thread posted! ({} tweets)", ids.len());
+                        for (i, id) in ids.iter().enumerate() {
+                            println!("  [{}/{}] ID: {id}", i + 1, ids.len());
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "Thread failed at tweet [{}/{}]: {}",
+                            e.failed_index + 1,
+                            chunks.len(),
+                            e.error
+                        );
+                        if !e.posted_ids.is_empty() {
+                            eprintln!("Already posted:");
+                            for (i, id) in e.posted_ids.iter().enumerate() {
+                                eprintln!("  [{}/{}] ID: {id}", i + 1, chunks.len());
+                            }
+                        }
+                        std::process::exit(1);
+                    }
                 }
             }
         }
