@@ -18,12 +18,6 @@ brew tap hulryung/xcli
 brew install xcli
 ```
 
-### Winget (Windows)
-
-```powershell
-winget install hulryung.xcli
-```
-
 ### 바이너리 다운로드
 
 [GitHub Releases](https://github.com/hulryung/xcli/releases/latest)에서 플랫폼별 바이너리를 다운로드할 수 있습니다.
@@ -40,7 +34,7 @@ winget install hulryung.xcli
 ### Cargo
 
 ```bash
-cargo install xcli
+cargo install --git https://github.com/hulryung/xcli.git
 ```
 
 ### 소스에서 빌드

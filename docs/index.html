@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>xcli - The fastest way to use X from your terminal</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Configuration -->
+<script>
+    tailwind.config = {
+        darkMode: "class",
+        theme: {
+            extend: {
+                colors: {
+                    "primary": "#1c92f2",
+                    "background-light": "#f5f7f8",
+                    "background-dark": "#101a22",
+                    "surface-dark": "#182530",
+                },
+                fontFamily: {
+                    "display": ["Inter", "sans-serif"],
+                    "mono": ["JetBrains Mono", "monospace"],
+                },
+                borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "2xl": "1rem", "full": "9999px"},
+            },
+        },
+    }
+</script>
+<!-- Material Icons -->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet"/>
+<style type="text/tailwindcss">
+    @layer utilities {
+        .text-glow {
+            text-shadow: 0 0 20px rgba(28, 146, 242, 0.5);
+        }
+        .border-glow {
+            box-shadow: 0 0 15px rgba(28, 146, 242, 0.1);
+        }
+    }
+
+    .typing-cursor::after {
+        content: '\25CB';
+        animation: blink 1s step-start infinite;
+        color: #1c92f2;
+        margin-left: 2px;
+    }
+
+    @keyframes blink {
+        50% { opacity: 0; }
+    }
+</style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 font-display selection:bg-primary selection:text-white overflow-x-hidden">
+
+<!-- Navbar -->
+<nav class="fixed w-full z-50 backdrop-blur-md bg-background-light/80 dark:bg-background-dark/80 border-b border-slate-200 dark:border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="flex items-center justify-between h-16">
+<div class="flex items-center gap-2">
+<span class="text-2xl font-bold text-primary tracking-tighter">&gt; xcli_</span>
+</div>
+<div class="hidden md:block">
+<div class="ml-10 flex items-baseline space-x-4">
+<a class="hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors" href="#features">Features</a>
+<a class="hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors" href="#examples">Examples</a>
+<a class="hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition-colors" href="#install">Install</a>
+<a class="bg-primary/10 hover:bg-primary/20 text-primary px-4 py-2 rounded-lg text-sm font-semibold transition-all flex items-center gap-2" href="https://github.com/hulryung/xcli" target="_blank">
+<svg aria-hidden="true" class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path>
+</svg>
+GitHub
+</a>
+</div>
+</div>
+</div>
+</div>
+</nav>
+
+<!-- Hero Section -->
+<section class="relative pt-32 pb-20 lg:pt-48 lg:pb-32 overflow-hidden">
+<div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full max-w-7xl pointer-events-none opacity-20">
+<div class="absolute top-20 left-20 w-72 h-72 bg-primary rounded-full blur-[100px]"></div>
+<div class="absolute bottom-20 right-20 w-96 h-96 bg-indigo-600 rounded-full blur-[120px]"></div>
+</div>
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+<div class="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
+<!-- Text Content -->
+<div class="text-center lg:text-left">
+<div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold uppercase tracking-wide mb-6">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span> v1.2.0 Released
+</div>
+<h1 class="text-5xl md:text-6xl lg:text-7xl font-bold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight">
+Post to X from your <span class="text-transparent bg-clip-text bg-gradient-to-r from-primary to-indigo-400">terminal</span>.
+</h1>
+<p class="text-lg md:text-xl text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
+A fast, lightweight CLI for X (Twitter). Tweet, thread, and delete — all from your command line. Built with Rust.
+</p>
+<div class="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+<a href="#install" class="w-full sm:w-auto px-8 py-4 bg-primary hover:bg-blue-600 text-white font-semibold rounded-xl transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 group">
+Get Started
+<span class="material-icons-round group-hover:translate-x-1 transition-transform">arrow_forward</span>
+</a>
+<a href="https://github.com/hulryung/xcli" target="_blank" class="w-full sm:w-auto px-8 py-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 font-medium rounded-xl transition-all flex items-center justify-center gap-2">
+<svg aria-hidden="true" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+<path clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" fill-rule="evenodd"></path>
+</svg>
+View on GitHub
+</a>
+</div>
+</div>
+<!-- Terminal Mockup -->
+<div class="relative group perspective-1000">
+<div class="absolute -inset-1 bg-gradient-to-r from-primary to-purple-600 rounded-2xl blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200"></div>
+<div class="relative bg-[#1e1e1e] rounded-xl border border-slate-700 shadow-2xl overflow-hidden font-mono text-sm sm:text-base leading-relaxed transform transition-transform duration-500 hover:scale-[1.01] hover:rotate-1">
+<!-- Terminal Header -->
+<div class="flex items-center gap-2 px-4 py-3 bg-[#2d2d2d] border-b border-slate-700">
+<div class="flex gap-2">
+<div class="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+<div class="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+<div class="w-3 h-3 rounded-full bg-[#27c93f]"></div>
+</div>
+<div class="flex-1 text-center text-slate-400 text-xs">terminal</div>
+</div>
+<!-- Terminal Body -->
+<div class="p-6 text-slate-300 min-h-[300px]">
+<div class="mb-4">
+<span class="text-green-400">$</span> <span class="text-slate-100">xcli tweet "Just shipped the new feature! #rust #cli"</span>
+</div>
+<div>
+<div class="text-green-400 mt-2">Tweet posted! ID: 1893847562031</div>
+<div class="mt-6 mb-4">
+<span class="text-green-400">$</span> <span class="text-slate-100">xcli tweet "First part of the story
+---
+Second part continues here
+---
+Final thoughts" --dry-run</span>
+</div>
+<div class="text-slate-400 mt-2">Thread preview (3 tweets):</div>
+<div class="text-slate-400">&nbsp;&nbsp;[1/3] (32/280) First part of the story</div>
+<div class="text-slate-400">&nbsp;&nbsp;[2/3] (30/280) Second part continues here</div>
+<div class="text-slate-400">&nbsp;&nbsp;[3/3] (14/280) Final thoughts</div>
+<div class="mt-6">
+<span class="text-green-400">$</span> <span class="typing-cursor"></span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Features Grid -->
+<section class="py-20 bg-white dark:bg-surface-dark border-y border-slate-200 dark:border-slate-800" id="features">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="text-center mb-16">
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Built for Speed &amp; Simplicity</h2>
+<p class="text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">Everything you need to post on X without leaving your terminal.</p>
+</div>
+<div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+<!-- Feature 1 -->
+<div class="p-6 rounded-2xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-icons-round">edit_note</span>
+</div>
+<h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">One-Line Tweeting</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+<code class="text-xs bg-slate-700/50 px-1.5 py-0.5 rounded">xcli tweet "Hello!"</code> — that's it. Compose and post in a single command.
+</p>
+</div>
+<!-- Feature 2 -->
+<div class="p-6 rounded-2xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-icons-round">call_split</span>
+</div>
+<h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">Auto-Threading</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+Long text is automatically split into threads at 280 chars, or use <code class="text-xs bg-slate-700/50 px-1.5 py-0.5 rounded">---</code> to control split points. Preview with <code class="text-xs bg-slate-700/50 px-1.5 py-0.5 rounded">--dry-run</code>.
+</p>
+</div>
+<!-- Feature 3 -->
+<div class="p-6 rounded-2xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-icons-round">group_add</span>
+</div>
+<h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">Team OAuth</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+Admin shares API Key/Secret, each member authenticates with their own X account via browser-based OAuth flow.
+</p>
+</div>
+<!-- Feature 4 -->
+<div class="p-6 rounded-2xl bg-background-light dark:bg-background-dark border border-slate-200 dark:border-slate-800 hover:border-primary/50 transition-colors group">
+<div class="w-12 h-12 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+<span class="material-icons-round">public</span>
+</div>
+<h3 class="text-xl font-semibold text-slate-900 dark:text-white mb-2">Cross-Platform</h3>
+<p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+Native binaries for macOS, Linux, and Windows. Install via Homebrew, Winget, Cargo, or download directly.
+</p>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Code Examples -->
+<section class="py-20 overflow-hidden" id="examples">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<div class="grid lg:grid-cols-5 gap-12 items-center">
+<div class="lg:col-span-2">
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-6">Simple Commands</h2>
+<p class="text-slate-600 dark:text-slate-400 mb-8 leading-relaxed">
+Intuitive subcommands that do exactly what you'd expect. No complex flags, no configuration files to learn.
+</p>
+<ul class="space-y-4">
+<li class="flex items-center gap-3 text-slate-300">
+<span class="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center">
+<span class="material-icons-round text-sm">check</span>
+</span>
+Tweet, thread, and delete
+</li>
+<li class="flex items-center gap-3 text-slate-300">
+<span class="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center">
+<span class="material-icons-round text-sm">check</span>
+</span>
+Dry-run mode for thread preview
+</li>
+<li class="flex items-center gap-3 text-slate-300">
+<span class="flex-shrink-0 w-6 h-6 rounded-full bg-green-500/20 text-green-500 flex items-center justify-center">
+<span class="material-icons-round text-sm">check</span>
+</span>
+OAuth login &amp; status management
+</li>
+</ul>
+</div>
+<div class="lg:col-span-3">
+<div class="bg-surface-dark rounded-xl border border-slate-700 shadow-2xl overflow-hidden">
+<div class="flex items-center justify-between px-4 py-3 border-b border-slate-700 bg-[#1e1e1e]">
+<span class="text-slate-400 text-xs font-mono">examples.sh</span>
+<div class="flex gap-1.5">
+<div class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
+<div class="w-2.5 h-2.5 rounded-full bg-slate-600"></div>
+</div>
+</div>
+<div class="p-6 font-mono text-sm overflow-x-auto">
+<pre class="text-slate-300"><span class="text-slate-500"># Post a tweet</span>
+<span class="text-primary">$</span> xcli tweet "Hello from xcli!"
+<span class="text-green-400">Tweet posted! ID: 1893847562031</span>
+
+<span class="text-slate-500"># Post a thread with manual splits</span>
+<span class="text-primary">$</span> xcli tweet "First tweet --- Second tweet --- Third tweet"
+<span class="text-green-400">Thread posted! (3 tweets)</span>
+
+<span class="text-slate-500"># Preview thread without posting</span>
+<span class="text-primary">$</span> xcli tweet "Long text here..." --dry-run
+<span class="text-slate-400">Thread preview (2 tweets):
+  [1/2] (250/280) First chunk...
+  [2/2] (180/280) Second chunk...</span>
+
+<span class="text-slate-500"># Delete a tweet</span>
+<span class="text-primary">$</span> xcli delete 1893847562031
+<span class="text-green-400">Tweet 1893847562031 deleted.</span>
+
+<span class="text-slate-500"># OAuth login (opens browser)</span>
+<span class="text-primary">$</span> xcli auth login
+<span class="text-green-400">Logged in as @username</span></pre>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Installation Section -->
+<section class="py-20 bg-background-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800" id="install">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Install in Seconds</h2>
+<p class="text-slate-600 dark:text-slate-400 mb-10">Pick your favorite package manager and get started.</p>
+<div class="bg-white dark:bg-background-dark rounded-2xl shadow-xl border border-slate-200 dark:border-slate-700 overflow-hidden">
+<!-- Tabs -->
+<div class="flex border-b border-slate-200 dark:border-slate-700 overflow-x-auto" id="install-tabs">
+<button class="flex-1 py-4 px-6 text-sm font-medium text-primary border-b-2 border-primary bg-primary/5 focus:outline-none whitespace-nowrap">
+Homebrew (macOS/Linux)
+</button>
+<button class="flex-1 py-4 px-6 text-sm font-medium text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 focus:outline-none whitespace-nowrap">
+Cargo (from source)
+</button>
+</div>
+<!-- Command Box -->
+<div class="p-8 flex items-center justify-between gap-4 bg-[#1e1e1e]">
+<code id="install-code" class="font-mono text-green-400 text-lg">brew tap hulryung/xcli &amp;&amp; brew install xcli</code>
+<button onclick="navigator.clipboard.writeText(document.getElementById('install-code').textContent)" class="p-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white transition-colors flex-shrink-0" title="Copy to clipboard">
+<span class="material-icons-round text-lg">content_copy</span>
+</button>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800/50 px-8 py-3 text-left">
+<p class="text-xs text-slate-500 font-mono">Latest version: v1.2.0 &bull; MIT License</p>
+</div>
+</div>
+<!-- Platform badges -->
+<div class="mt-8 flex flex-wrap justify-center gap-3">
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">
+<span class="material-icons-round text-sm">laptop_mac</span> macOS
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">
+<span class="material-icons-round text-sm">computer</span> Linux
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">
+<span class="material-icons-round text-sm">desktop_windows</span> Windows
+</span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700 text-xs text-slate-300">Intel &amp; ARM64</span>
+</div>
+<!-- Tech stack -->
+<div class="mt-6 flex justify-center gap-6 opacity-60 hover:opacity-100 transition-all duration-500">
+<div class="flex items-center gap-2" title="Built with Rust">
+<svg class="w-7 h-7 text-white" fill="currentColor" viewBox="0 0 106 106" xmlns="http://www.w3.org/2000/svg">
+<path d="M68.109 49.333c2.722-1.848 4.498-4.908 4.498-8.384 0-5.74-4.59-10.375-10.28-10.375H47.53v18.76h14.774c2.256 0 4.295-.693 5.805-1.876V49.333zM62.327 75.36c3.153-1.872 5.258-5.32 5.258-9.28 0-5.996-4.832-10.846-10.812-10.846H47.53v20.126h14.797zM94.55 53c0-22.922-18.578-41.5-41.5-41.5S11.55 30.078 11.55 53s18.578 41.5 41.5 41.5S94.55 75.922 94.55 53zM82.85 53c0 6.64-2.096 12.766-5.637 17.846l-4.225-2.227-1.123 3.32c-3.792 11.233-11.238 9.923-14.717 9.47l-.966-2.91-2.923 1.258c-4.907 2.112-9.66.19-12.016-1.02l.068-4.148-3.527 2.222c-6.732 4.24-11.398-1.536-12.928-3.725l1.83-2.14-3.266-1.02c-5.98-1.87-4.757-8.157-4.15-10.702l2.368-1.573-3.664-2.61c-4.262-3.033-2.695-8.527-1.72-10.96l4.244.17-2.607-3.665c-2.483-3.483-1.018-9.74 1.34-11.905l3.868 1.933-.21-4.243c-.276-5.52 4.67-9.52 7.07-10.844l2.585 3.328 1.832-4.155c4.71-10.685 12.87-5.903 15.65-4.137l.635 4.417 3.526-2.22c5.9-3.716 11.458.746 13.568 2.19l-1.56 3.738 3.535-.747c3.385-.715 10.36 1.87 11.758 7.37l-3.327 1.832 3.86 1.933c4.897 2.45 4.412 10.283 3.86 12.93l-3.86.815 3.01 2.373C81.428 44.596 82.85 48.665 82.85 53z"></path>
+</svg>
+<span class="font-bold text-sm text-slate-300">Rust</span>
+</div>
+<div class="h-6 w-px bg-slate-700"></div>
+<div class="flex items-center gap-2" title="X API v2">
+<svg aria-hidden="true" class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+<path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"></path>
+</svg>
+<span class="font-bold text-sm text-slate-300">API v2</span>
+</div>
+<div class="h-6 w-px bg-slate-700"></div>
+<div class="flex items-center gap-2" title="OAuth 1.0a">
+<span class="material-icons-round text-white text-xl">lock</span>
+<span class="font-bold text-sm text-slate-300">OAuth 1.0a</span>
+</div>
+</div>
+</div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-background-dark py-12 border-t border-slate-800">
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-6">
+<div class="flex items-center gap-2">
+<span class="text-xl font-bold text-slate-200 tracking-tighter">&gt; xcli_</span>
+<span class="text-xs text-slate-500 ml-2">&copy; 2025 xcli contributors.</span>
+</div>
+<div class="flex items-center gap-8 text-sm">
+<a class="text-slate-500 hover:text-primary transition-colors" href="https://github.com/hulryung/xcli#readme" target="_blank">Documentation</a>
+<a class="text-slate-500 hover:text-primary transition-colors" href="https://github.com/hulryung/xcli" target="_blank">GitHub</a>
+<a class="text-slate-500 hover:text-primary transition-colors" href="https://github.com/hulryung/xcli/issues" target="_blank">Report Issue</a>
+</div>
+<div class="text-xs text-slate-600">
+Released under <a class="underline hover:text-slate-400" href="https://github.com/hulryung/xcli/blob/main/LICENSE" target="_blank">MIT License</a>
+</div>
+</div>
+</footer>
+
+<script>
+    const tabs = document.querySelectorAll('#install-tabs button');
+    const codeBlock = document.getElementById('install-code');
+
+    const commands = [
+        "brew tap hulryung/xcli && brew install xcli",
+        "cargo install --git https://github.com/hulryung/xcli.git"
+    ];
+
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => {
+                t.classList.remove('text-primary', 'border-primary', 'bg-primary/5', 'border-b-2');
+                t.classList.add('text-slate-500', 'dark:text-slate-400');
+            });
+            tab.classList.remove('text-slate-500', 'dark:text-slate-400');
+            tab.classList.add('text-primary', 'border-b-2', 'border-primary', 'bg-primary/5');
+            codeBlock.textContent = commands[index];
+        });
+    });
+</script>
+</body>
+</html>

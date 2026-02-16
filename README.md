@@ -18,12 +18,6 @@ brew tap hulryung/xcli
 brew install xcli
 ```
 
-### Winget (Windows)
-
-```powershell
-winget install hulryung.xcli
-```
-
 ### Binary Download
 
 Download pre-built binaries from [GitHub Releases](https://github.com/hulryung/xcli/releases/latest).
@@ -40,7 +34,7 @@ Download pre-built binaries from [GitHub Releases](https://github.com/hulryung/x
 ### Cargo
 
 ```bash
-cargo install xcli
+cargo install --git https://github.com/hulryung/xcli.git
 ```
 
 ### Build from Source
