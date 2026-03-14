@@ -194,7 +194,10 @@ async fn main() {
                         chunks[0]
                     );
                 } else {
-                    println!("Reply thread preview ({} tweets, replying to {id}):", chunks.len());
+                    println!(
+                        "Reply thread preview ({} tweets, replying to {id}):",
+                        chunks.len()
+                    );
                     for (i, chunk) in chunks.iter().enumerate() {
                         println!(
                             "  [{}/{}] ({}/280) {}",
