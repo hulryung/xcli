@@ -108,6 +108,34 @@ pub struct ThreadError {
     pub error: String,
 }
 
+pub async fn create_reply_thread(
+    config: &Config,
+    reply_to_id: &str,
+    chunks: &[String],
+) -> Result<Vec<String>, ThreadError> {
+    let mut posted_ids: Vec<String> = Vec::new();
+
+    for (i, chunk) in chunks.iter().enumerate() {
+        let parent = if i == 0 {
+            reply_to_id
+        } else {
+            posted_ids.last().unwrap()
+        };
+        match create_tweet(config, chunk, Some(parent)).await {
+            Ok(id) => posted_ids.push(id),
+            Err(e) => {
+                return Err(ThreadError {
+                    posted_ids,
+                    failed_index: i,
+                    error: e,
+                });
+            }
+        }
+    }
+
+    Ok(posted_ids)
+}
+
 pub async fn create_thread(config: &Config, chunks: &[String]) -> Result<Vec<String>, ThreadError> {
     let mut posted_ids: Vec<String> = Vec::new();
 

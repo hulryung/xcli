@@ -38,6 +38,19 @@ enum Commands {
         #[arg(long)]
         dry_run: bool,
     },
+    /// Reply to a tweet by ID (long text is automatically threaded)
+    #[command(
+        long_about = "Reply to a tweet by ID (long text is automatically threaded)\n\nPosts a reply to the specified tweet. If the text exceeds 280 weighted\ncharacters, subsequent tweets are threaded as replies to each other.\n\nExamples:\n  xcli reply 1234567890 \"This is a reply!\"\n  xcli reply 1234567890 \"Long reply...\" --dry-run"
+    )]
+    Reply {
+        /// Tweet ID to reply to
+        id: String,
+        /// Text content of the reply
+        text: String,
+        /// Preview thread split without posting
+        #[arg(long)]
+        dry_run: bool,
+    },
     /// Delete a tweet by ID
     #[command(
         long_about = "Delete a tweet by ID\n\nPermanently deletes the specified tweet from your account.\n\nExamples:\n  xcli delete 1234567890"
@@ -163,6 +176,77 @@ async fn main() {
                             eprintln!("Already posted:");
                             for (i, id) in e.posted_ids.iter().enumerate() {
                                 eprintln!("  [{}/{}] ID: {id}", i + 1, chunks.len());
+                            }
+                        }
+                        std::process::exit(1);
+                    }
+                }
+            }
+        }
+        Commands::Reply { id, text, dry_run } => {
+            let chunks = thread::split_text(&text);
+
+            if dry_run {
+                if chunks.len() == 1 {
+                    println!(
+                        "Reply preview to {id} ({}/280):\n  {}",
+                        thread::weighted_len(&chunks[0]),
+                        chunks[0]
+                    );
+                } else {
+                    println!("Reply thread preview ({} tweets, replying to {id}):", chunks.len());
+                    for (i, chunk) in chunks.iter().enumerate() {
+                        println!(
+                            "  [{}/{}] ({}/280) {}",
+                            i + 1,
+                            chunks.len(),
+                            thread::weighted_len(chunk),
+                            chunk
+                        );
+                    }
+                }
+                return;
+            }
+
+            if let Err((idx, len)) = thread::validate_chunks(&chunks) {
+                eprintln!(
+                    "Error: chunk {} exceeds 280 characters ({}/280). Cannot post.",
+                    idx + 1,
+                    len
+                );
+                eprintln!("Use --dry-run to preview the split, or use --- separators to control splitting.");
+                std::process::exit(1);
+            }
+
+            let config = load_config_or_exit();
+
+            if chunks.len() == 1 {
+                match api::create_tweet(&config, &chunks[0], Some(&id)).await {
+                    Ok(reply_id) => println!("Reply posted! ID: {reply_id}"),
+                    Err(e) => {
+                        eprintln!("Failed to post reply: {e}");
+                        std::process::exit(1);
+                    }
+                }
+            } else {
+                match api::create_reply_thread(&config, &id, &chunks).await {
+                    Ok(ids) => {
+                        println!("Reply thread posted! ({} tweets)", ids.len());
+                        for (i, tid) in ids.iter().enumerate() {
+                            println!("  [{}/{}] ID: {tid}", i + 1, ids.len());
+                        }
+                    }
+                    Err(e) => {
+                        eprintln!(
+                            "Reply thread failed at tweet [{}/{}]: {}",
+                            e.failed_index + 1,
+                            chunks.len(),
+                            e.error
+                        );
+                        if !e.posted_ids.is_empty() {
+                            eprintln!("Already posted:");
+                            for (i, tid) in e.posted_ids.iter().enumerate() {
+                                eprintln!("  [{}/{}] ID: {tid}", i + 1, chunks.len());
                             }
                         }
                         std::process::exit(1);
