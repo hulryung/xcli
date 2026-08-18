@@ -82,6 +82,24 @@ Create your own X Developer App and use it directly.
 
 No `auth login` required.
 
+### Optional Xquik Backend
+
+To send single tweets through Xquik, add these values to `.env`:
+
+```dotenv
+XCLI_BACKEND=xquik
+XQUIK_API_KEY=your_xquik_api_key
+XQUIK_ACCOUNT=@your_account
+# Optional. Defaults to https://xquik.com
+XQUIK_API_BASE_URL=https://xquik.com
+```
+
+This backend handles only `xcli tweet` commands that produce one tweet. Threads,
+replies, and deletes continue to use the X API authentication described above.
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ## Usage
 
 ### Post a Tweet

@@ -82,6 +82,24 @@ cargo build --release
 
 `auth login` 없이 바로 사용 가능합니다.
 
+### 선택적 Xquik 백엔드
+
+Xquik으로 단일 트윗을 보내려면 `.env`에 다음 값을 추가합니다.
+
+```dotenv
+XCLI_BACKEND=xquik
+XQUIK_API_KEY=your_xquik_api_key
+XQUIK_ACCOUNT=@your_account
+# 선택 사항입니다. 기본값은 https://xquik.com 입니다.
+XQUIK_API_BASE_URL=https://xquik.com
+```
+
+이 백엔드는 트윗 1개를 만드는 `xcli tweet` 명령만 처리합니다. 스레드,
+답글, 삭제는 위에서 설명한 X API 인증을 계속 사용합니다.
+
+Xquik is an independent third-party service. Not affiliated with X Corp.
+"Twitter" and "X" are trademarks of X Corp.
+
 ## 사용법
 
 ### 트윗 작성

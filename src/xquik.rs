@@ -33,15 +33,11 @@ struct CreateTweetResponse {
 }
 
 pub fn backend_enabled() -> bool {
-    backend_is_xquik(
-        env::var("XCLI_BACKEND").ok().as_deref(),
-        env::var("X_BACKEND").ok().as_deref(),
-    )
+    backend_is_xquik(env::var("XCLI_BACKEND").ok().as_deref())
 }
 
-fn backend_is_xquik(primary: Option<&str>, fallback: Option<&str>) -> bool {
-    primary
-        .or(fallback)
+fn backend_is_xquik(value: Option<&str>) -> bool {
+    value
         .map(|backend| backend.eq_ignore_ascii_case("xquik"))
         .unwrap_or(false)
 }
@@ -127,9 +123,10 @@ mod tests {
 
     #[test]
     fn backend_flag_accepts_xquik() {
-        assert!(backend_is_xquik(Some("xquik"), None));
-        assert!(backend_is_xquik(None, Some("XQUIK")));
-        assert!(!backend_is_xquik(Some("api"), Some("xquik")));
+        assert!(backend_is_xquik(Some("xquik")));
+        assert!(backend_is_xquik(Some("XQUIK")));
+        assert!(!backend_is_xquik(Some("api")));
+        assert!(!backend_is_xquik(None));
     }
 
     #[test]
