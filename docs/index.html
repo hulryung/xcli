@@ -275,6 +275,27 @@ OAuth login &amp; status management
 </div>
 </section>
 
+<!-- Optional Xquik Backend -->
+<section class="py-20 bg-white dark:bg-surface-dark border-y border-slate-200 dark:border-slate-800" id="xquik">
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+<h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Optional Xquik Backend</h2>
+<p class="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+Set these environment variables in <code class="text-xs bg-slate-700/50 px-1.5 py-0.5 rounded">.env</code> to route single-tweet commands through Xquik.
+</p>
+<div class="bg-background-dark rounded-xl border border-slate-700 p-6 font-mono text-sm overflow-x-auto mb-6">
+<pre class="text-slate-300"><span class="text-primary">XCLI_BACKEND</span>=xquik
+<span class="text-primary">XQUIK_API_KEY</span>=your_xquik_api_key
+<span class="text-primary">XQUIK_ACCOUNT</span>=@your_account
+<span class="text-slate-500"># Optional. Defaults to https://xquik.com</span>
+<span class="text-primary">XQUIK_API_BASE_URL</span>=https://xquik.com</pre>
+</div>
+<p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+Only <code class="text-xs bg-slate-700/50 px-1.5 py-0.5 rounded">xcli tweet</code> commands that produce one tweet use this backend. Threads, replies, and deletes continue to use X API authentication.
+</p>
+<p class="text-xs text-slate-500 mt-4">Xquik is an independent third-party service. Not affiliated with X Corp. &quot;Twitter&quot; and &quot;X&quot; are trademarks of X Corp.</p>
+</div>
+</section>
+
 <!-- Installation Section -->
 <section class="py-20 bg-background-light dark:bg-surface-dark border-t border-slate-200 dark:border-slate-800" id="install">
 <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">

@@ -3,6 +3,7 @@ mod auth;
 mod config;
 mod oauth;
 mod thread;
+mod xquik;
 
 use clap::{Parser, Subcommand};
 use config::{ApiKeys, Config, Credentials};
@@ -108,6 +109,7 @@ enum AuthAction {
 
 #[tokio::main]
 async fn main() {
+    dotenvy::dotenv().ok();
     let cli = Cli::parse();
 
     match cli.command {
@@ -145,6 +147,34 @@ async fn main() {
                 );
                 eprintln!("Use --dry-run to preview the split, or use --- separators to control splitting.");
                 std::process::exit(1);
+            }
+
+            if xquik::backend_enabled() {
+                if chunks.len() == 1 {
+                    let config = match xquik::config_from_env() {
+                        Ok(config) => config,
+                        Err(e) => {
+                            eprintln!("Error: {e}");
+                            std::process::exit(1);
+                        }
+                    };
+
+                    match xquik::create_tweet(&config, &chunks[0]).await {
+                        Ok(xquik::XquikPostResult::Posted(id)) => {
+                            println!("Tweet posted with Xquik! ID: {id}");
+                        }
+                        Ok(xquik::XquikPostResult::Accepted(id)) => {
+                            println!("Tweet accepted by Xquik. Confirmation pending: {id}");
+                        }
+                        Err(e) => {
+                            eprintln!("Failed to post tweet with Xquik: {e}");
+                            std::process::exit(1);
+                        }
+                    }
+                    return;
+                }
+
+                eprintln!("Xquik backend supports single tweets only. Using existing X API auth for threads.");
             }
 
             let config = load_config_or_exit();
